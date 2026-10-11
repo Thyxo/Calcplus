@@ -19,6 +19,10 @@ Repoet er et statisk site. Vercel-projektet er koblet til GitHub, så hvert push
 - push til `main` → produktion
 - push til andre branches → preview-link
 
+Vercel-projekt: **calcplus** (team *thyxo's projects*)
+- Produktion (fra `main`): https://calcplus-thyxos-projects.vercel.app
+- Preview af udviklingsbranchen: https://calcplus-git-claude-stoic-allen-fqrvfk-thyxos-projects.vercel.app
+
 Ingen build-kommando og ingen output-mappe (roden udgives som den er). `vercel.json` sørger for at `sw.js` aldrig caches af CDN'et.
 
 ### Installér på iPhone
