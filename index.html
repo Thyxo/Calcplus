@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Lommeregner</title>
+  <meta name="description" content="Lommeregner">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lommeregner">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <button class="round-btn" id="btn-history" aria-label="Historik">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 6.6V12H7.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="arm-zone" aria-hidden="true"></div>
+      <button class="round-btn" id="btn-mode" aria-label="Lommeregnertype">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.8" width="14" height="18.4" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="7.8" y="5.6" width="8.4" height="3.2" rx=".8" fill="currentColor"/><g fill="currentColor"><circle cx="8.9" cy="11.6" r="1.05"/><circle cx="12" cy="11.6" r="1.05"/><circle cx="15.1" cy="11.6" r="1.05"/><circle cx="8.9" cy="14.7" r="1.05"/><circle cx="12" cy="14.7" r="1.05"/><circle cx="15.1" cy="14.7" r="1.05"/><circle cx="8.9" cy="17.8" r="1.05"/><circle cx="12" cy="17.8" r="1.05"/><circle cx="15.1" cy="17.8" r="1.05"/></g></svg>
+      </button>
+      <span id="indicator" aria-hidden="true"></span>
+    </header>
+
+    <section id="display" aria-live="polite">
+      <div class="line expr" id="expr"></div>
+      <div class="line main" id="main"><span class="num">0</span></div>
+    </section>
+
+    <main id="keypad">
+      <button class="key fn" data-key="back" aria-label="Slet">
+        <svg viewBox="0 0 32 24" aria-hidden="true"><path d="M10.6 3.2h15.2a3 3 0 0 1 3 3v11.6a3 3 0 0 1-3 3H10.6a2 2 0 0 1-1.5-.7L2.8 13.3a2 2 0 0 1 0-2.6l6.3-6.8a2 2 0 0 1 1.5-.7Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="m14.2 8 7.6 8m0-8-7.6 8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+      <button class="key fn" data-key="clear" id="key-clear"><span class="txt">AC</span></button>
+      <button class="key fn" data-key="pct" aria-label="Procent">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.6 4.2 6.4 19.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><ellipse cx="7.3" cy="7.4" rx="2.8" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.9"/><ellipse cx="16.7" cy="16.6" rx="2.8" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.9"/></svg>
+      </button>
+      <button class="key op" data-key="÷" aria-label="Divider">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12h15" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="6.3" r="1.55" fill="currentColor"/><circle cx="12" cy="17.7" r="1.55" fill="currentColor"/></svg>
+      </button>
+
+      <button class="key num" data-key="7">7</button>
+      <button class="key num" data-key="8">8</button>
+      <button class="key num" data-key="9">9</button>
+      <button class="key op" data-key="×" aria-label="Gange">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5.8 5.8 12.4 12.4m0-12.4L5.8 18.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+
+      <button class="key num" data-key="4">4</button>
+      <button class="key num" data-key="5">5</button>
+      <button class="key num" data-key="6">6</button>
+      <button class="key op" data-key="-" aria-label="Minus">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 12h15.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+
+      <button class="key num" data-key="1">1</button>
+      <button class="key num" data-key="2">2</button>
+      <button class="key num" data-key="3">3</button>
+      <button class="key op" data-key="+" aria-label="Plus">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 12h15.6M12 4.2v15.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+
+      <button class="key num" data-key="pm" aria-label="Plus/minus">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.2 6.6h6.6M6.5 3.3v6.6M17.4 3.6 6.6 20.4M14.2 17.4h6.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <button class="key num" data-key="0">0</button>
+      <button class="key num" data-key=","><span class="comma">,</span></button>
+      <button class="key op" data-key="=" aria-label="Lig med">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.8 8.6h14.4M4.8 15.4h14.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </main>
+  </div>
+
+  <!-- Menu (Almindelig / Videnskabelig / ...) -->
+  <div id="menu-scrim" class="scrim" hidden></div>
+  <div id="mode-menu" class="glass-menu" hidden>
+    <button class="mi" data-mode="basic"><span class="check">
+      <svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="mi-ico"><svg viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3.5 6.5h5M6 4v5M14.5 6.5h6M4 15l4 4M8 15l-4 4M14.5 17h6"/></g><circle cx="17.5" cy="14.4" r=".9" fill="currentColor"/><circle cx="17.5" cy="19.6" r=".9" fill="currentColor"/></svg></span>
+      <span class="mi-txt">Almindelig</span></button>
+    <button class="mi" data-mode="sci"><span class="check"></span>
+      <span class="mi-ico fx"><i>f</i>(x)</span>
+      <span class="mi-txt">Videnskabelig</span></button>
+    <button class="mi" data-mode="notes"><span class="check"></span>
+      <span class="mi-ico"><svg viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 10.5h18M12 3v18M5 4.5l3.5 3M8.5 4.5 5 7.5M14.5 5.5c2 0 2.5 2.5 4.5 2.5M5 14l3 3m0-3-3 3M15 19c1-3 2.5-4.5 4.5-5"/></g></svg></span>
+      <span class="mi-txt">Matematiknoter</span></button>
+    <div class="mi-sep"></div>
+    <button class="mi" data-mode="convert"><span class="check"></span>
+      <span class="mi-ico"><svg viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8H4.5m3.5-3.5L4.5 8 8 11.5M4 16h15.5M16 12.5l3.5 3.5-3.5 3.5"/></g></svg></span>
+      <span class="mi-txt">Konverter</span></button>
+  </div>
+
+  <!-- Kopiér/indsæt-boble -->
+  <div id="copy-bubble" hidden>
+    <button data-act="copy">Kopiér</button><span class="sep"></span><button data-act="paste">Indsæt</button>
+  </div>
+
+  <!-- Historik -->
+  <div id="history" class="sheet" hidden>
+    <div class="sheet-head">
+      <button class="sheet-link" id="history-clear">Ryd</button>
+      <span class="sheet-title">Historik</span>
+      <button class="sheet-link bold" id="history-done">OK</button>
+    </div>
+    <ul id="history-list"></ul>
+    <p id="history-empty">Ingen historik</p>
+  </div>
+
+  <!-- Hemmeligt panel -->
+  <div id="secret" class="sheet secret" hidden>
+    <div class="sheet-head">
+      <span></span>
+      <span class="sheet-title">Indstillinger</span>
+      <button class="sheet-link bold" id="secret-done">OK</button>
+    </div>
+    <div class="secret-body">
+      <div class="group">
+        <label class="row"><span>Force aktiv</span><input type="checkbox" class="switch" data-s="enabled"></label>
+        <div class="row"><span>Status</span><span id="s-status" class="muted"></span></div>
+      </div>
+
+      <h4>Mål</h4>
+      <div class="group">
+        <div class="row"><div class="seg" data-s-seg="targetMode">
+          <button data-v="fixed">Tal</button><button data-v="tomorrow">I morgen</button><button data-v="today">I dag</button><button data-v="time">Klokken</button>
+        </div></div>
+        <label class="row" id="row-target"><span>Måltal</span><input type="text" inputmode="decimal" data-s="target" placeholder="fx 2100" autocomplete="off"></label>
+        <label class="row" id="row-offset"><span>Minutter frem</span><input type="number" inputmode="numeric" data-s="timeOffset"></label>
+        <div class="row"><span>Rammer nu</span><span id="s-target" class="strong"></span></div>
+      </div>
+
+      <h4>Talstrøm</h4>
+      <div class="group">
+        <label class="row"><span>Start</span>
+          <select data-s="trigger">
+            <option value="nth">Ved tal nr. N</option>
+            <option value="afterEquals">Første tal efter =</option>
+            <option value="manual">Manuel (tryk øverst i midten)</option>
+          </select></label>
+        <label class="row" id="row-nth"><span>N (tal nr.)</span>
+          <select data-s="nth"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+        <label class="row"><span>Antal ramte før stop</span>
+          <select data-s="uses"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="0">Ubegrænset</option></select></label>
+        <label class="row"><span>Ret sidste tal ved =</span><input type="checkbox" class="switch" data-s="lateFix"></label>
+        <label class="row"><span>Tillad operator-skift</span><input type="checkbox" class="switch" data-s="allowSwap"></label>
+      </div>
+
+      <h4>Udseende</h4>
+      <div class="group">
+        <label class="row"><span>Markér valgt operator</span><input type="checkbox" class="switch" data-s="opHighlight"></label>
+        <label class="row"><span>Diskret prik når klar</span><input type="checkbox" class="switch" data-s="indicator"></label>
+      </div>
+
+      <div class="group">
+        <button class="row btn" id="s-reset">Nulstil tæller</button>
+        <button class="row btn" id="s-selftest">Kør selvtest (2.000 regnestykker)</button>
+        <button class="row btn danger" id="s-panic">PANIK – slå force fra</button>
+      </div>
+      <pre id="s-selftest-out" hidden></pre>
+
+      <h4>Log</h4>
+      <pre id="s-log"></pre>
+      <p class="foot">Hemmelig adgang: 5 hurtige tryk i øverste højre hjørne. Panik: hold historik-knappen (uret) inde.</p>
+    </div>
+  </div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
