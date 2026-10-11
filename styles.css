@@ -38,6 +38,29 @@ html, body {
 
 button { font: inherit; color: inherit; border: 0; background: none; padding: 0; margin: 0; cursor: pointer; }
 svg { display: block; }
+.g {
+  display: block;
+  flex: none;
+  background-color: currentColor;
+  -webkit-mask: var(--m) center / contain no-repeat;
+  mask: var(--m) center / contain no-repeat;
+}
+.g-back { --m: url(glyphs/back.png); }
+.g-pct { --m: url(glyphs/pct.png); }
+.g-pm { --m: url(glyphs/pm.png); }
+.g-comma { --m: url(glyphs/comma.png); }
+.g-div { --m: url(glyphs/div.png); }
+.g-mul { --m: url(glyphs/mul.png); }
+.g-sub { --m: url(glyphs/sub.png); }
+.g-add { --m: url(glyphs/add.png); }
+.g-eq { --m: url(glyphs/eq.png); }
+.g-clock { --m: url(glyphs/clock.png); }
+.g-calc { --m: url(glyphs/calc.png); }
+.g-m-check { --m: url(glyphs/m-check.png); }
+.g-m-basic { --m: url(glyphs/m-basic.png); }
+.g-m-sci { --m: url(glyphs/m-sci.png); }
+.g-m-notes { --m: url(glyphs/m-notes.png); }
+.g-m-conv { --m: url(glyphs/m-conv.png); }
 [hidden] { display: none !important; }
 
 #app {
@@ -75,7 +98,7 @@ svg { display: block; }
   transition: background-color .3s;
 }
 .round-btn.pressed { background: #2a2a2a; transition: none; }
-.round-btn svg { width: calc(6 * var(--u)); height: calc(6 * var(--u)); }
+.round-btn .g { width: calc(7.8 * var(--u)); height: calc(7.8 * var(--u)); }
 #arm-zone {
   position: absolute;
   left: 22%;
@@ -195,13 +218,9 @@ svg { display: block; }
   background: #ffffff;
   color: var(--op);
 }
-.key svg { width: calc(12 * var(--u)); height: calc(12 * var(--u)); }
-.key[data-key="×"] svg { width: calc(11 * var(--u)); height: calc(11 * var(--u)); }
-.key[data-key="back"] svg { width: calc(11 * var(--u)); height: calc(8.25 * var(--u)); }
-.key[data-key="pct"] svg { width: calc(12.4 * var(--u)); height: calc(12.4 * var(--u)); }
-.key[data-key="pm"] svg { width: calc(11.4 * var(--u)); height: calc(11.4 * var(--u)); }
+/* Tegn skåret ud af referencebillederne (132 px af 923 = 14,3 %) */
+.key .g { width: calc(14.3 * var(--u)); height: calc(14.3 * var(--u)); }
 .key .txt { font-size: calc(8.6 * var(--u)); letter-spacing: -0.01em; }
-.key .comma { font-size: calc(9.4 * var(--u)); transform: translateY(calc(-1.2 * var(--u))); }
 
 /* ---------- menu ---------- */
 .scrim { position: fixed; inset: 0; z-index: 20; }
@@ -211,7 +230,7 @@ svg { display: block; }
   top: calc(var(--safe-top) + 0px);
   right: calc(50vw - var(--W) / 2 + 3.8 * var(--u));
   width: calc(63.2 * var(--u));
-  padding: calc(2.2 * var(--u)) 0;
+  padding: calc(2.5 * var(--u)) 0;
   border-radius: calc(7 * var(--u));
   background: rgba(22, 21, 19, 0.88);
   -webkit-backdrop-filter: blur(30px) saturate(160%);
@@ -228,19 +247,18 @@ svg { display: block; }
   align-items: center;
   width: 100%;
   height: calc(10.6 * var(--u));
-  font-size: calc(4.45 * var(--u));
+  font-size: calc(4.6 * var(--u));
   letter-spacing: -0.01em;
   color: #f4f4f4;
   text-align: left;
 }
 .mi:active { background: rgba(255, 255, 255, 0.08); }
-.mi .check { width: calc(13.4 * var(--u)); display: flex; justify-content: flex-end; padding-right: calc(1.6 * var(--u)); flex: none; }
-.mi .check svg { width: calc(3.6 * var(--u)); height: calc(3.6 * var(--u)); }
-.mi .mi-ico { width: calc(8.5 * var(--u)); flex: none; display: flex; justify-content: center; }
-.mi .mi-ico svg { width: calc(5.2 * var(--u)); height: calc(5.2 * var(--u)); }
-.mi .mi-ico.fx { font-size: calc(3.7 * var(--u)); letter-spacing: -0.02em; }
-.mi .mi-txt { padding-left: calc(1.4 * var(--u)); }
-.mi-sep { height: 1px; background: rgba(255, 255, 255, 0.12); margin: calc(1.6 * var(--u)) calc(6 * var(--u)) calc(1.6 * var(--u)) calc(6 * var(--u)); }
+/* Placering målt i ref/1.webp: flueben-center 6,9u, ikon-center 13,8u, tekst fra 20,1u */
+.mi .check { width: calc(4.77 * var(--u)); height: calc(4.77 * var(--u)); margin-left: calc(4.5 * var(--u)); flex: none; }
+.mi .check .g { width: 100%; height: 100%; }
+.mi .mi-ico { width: calc(6.93 * var(--u)); height: calc(6.93 * var(--u)); margin-left: calc(1.06 * var(--u)); }
+.mi .mi-txt { padding-left: calc(2.83 * var(--u)); }
+.mi-sep { height: 1px; background: rgba(255, 255, 255, 0.12); margin: calc(2.75 * var(--u)) calc(5.96 * var(--u)) calc(2.75 * var(--u)) calc(5.74 * var(--u)); }
 
 /* ---------- kopiér-boble ---------- */
 #copy-bubble {

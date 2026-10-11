@@ -1,6 +1,6 @@
 // Service worker: alt caches ved installation, så appen virker 100 % offline.
 // Hæv VERSION ved ændringer, så telefonen henter den nye udgave.
-const VERSION = 'calcplus-v1';
+const VERSION = 'calcplus-v2';
 const ASSETS = [
   './',
   'index.html',
@@ -16,6 +16,9 @@ const ASSETS = [
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/maskable-512.png',
+  'icons/favicon-32.png',
+  ...['back', 'pct', 'pm', 'comma', 'div', 'mul', 'sub', 'add', 'eq', 'clock', 'calc',
+    'm-check', 'm-basic', 'm-sci', 'm-notes', 'm-conv'].map((g) => `glyphs/${g}.png`),
 ];
 
 self.addEventListener('install', (e) => {
@@ -30,21 +33,24 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache først (hurtigt + offline), opdatér i baggrunden.
+// Netværk først, så en ny version slår igennem med det samme; cachen bruges offline
+// (og hvis netværket er langsomt, efter 2,5 sek.).
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
-  e.respondWith(
-    caches.open(VERSION).then(async (cache) => {
-      const key = req.mode === 'navigate' ? 'index.html' : req;
-      const cached = await cache.match(key, { ignoreSearch: true });
-      const network = fetch(req)
-        .then((res) => {
-          if (res.ok && res.type === 'basic') cache.put(key, res.clone());
-          return res;
-        })
-        .catch(() => cached);
-      return cached || network;
-    }),
-  );
+  const key = req.mode === 'navigate' ? 'index.html' : req;
+  e.respondWith((async () => {
+    const cache = await caches.open(VERSION);
+    const network = fetch(req).then((res) => {
+      if (res.ok && res.type === 'basic') cache.put(key, res.clone());
+      return res;
+    });
+    const timeout = new Promise((r) => setTimeout(r, 2500));
+    try {
+      const res = await Promise.race([network, timeout]);
+      if (res) return res;
+    } catch { /* offline */ }
+    const cached = await cache.match(key, { ignoreSearch: true });
+    return cached || network;
+  })());
 });

@@ -11,7 +11,7 @@ En PWA, der ligner iPhonens lommeregner (iOS 18/26-udseendet) og i hemmelighed k
 npm run dev          # http://localhost:5173 (bruger npx serve)
 npm test             # enhedstests + 20.000 tilfældige force-regnestykker
 npm run selftest     # kun den randomiserede selvtest (10.000 som standard)
-npm run icons        # gendan app-ikonerne i icons/
+python3 scripts/extract-icons.py   # skær app-ikon og knap-tegn ud af ref/-billederne
 ```
 
 ### Udgivelse (Vercel)
@@ -97,7 +97,7 @@ For at starte igen: hemmeligt panel → *Force aktiv*.
 - **Umulige tilfælde** (fx division med 0, eller tallet skulle have over 9 cifre med for stor afrunding): motoren opgiver og viser det **ærlige** resultat. Det logges.
 - Menuen (Videnskabelig, Matematiknoter, Konverter) er kun visuel – kun *Almindelig* virker.
 - Skriften er San Francisco på iPhone. På Android/PC bruges systemets skrift, så det ligner mindre.
-- Ikonet er en egen tegning (grå/orange knapper), ikke Apples ikon.
+- Ikonerne er udsnit af dine egne screenshots: app-ikonet fra iPhone-hjemmeskærmen (samme kilde som Notes-appen), knap-tegnene fra lommeregner-billederne i `ref/`. Skiftes billederne ud, så kør `python3 scripts/extract-icons.py` igen (kræver Pillow + numpy).
 - **Idé til senere:** sæt målet live fra en anden telefon via WebSocket/SSE. Det kræver en lille Node-server (fx på Railway) – ikke bygget endnu.
 
 ---
@@ -139,7 +139,10 @@ src/calculator.js     lommeregner-tilstand og talstrøm (uden DOM, testbar)
 src/settings.js       indstillinger og mål (i morgen/i dag/klokken)
 src/selftest.js       randomiseret selvtest (Node + i appen)
 src/app.js            UI, gestusser, panel, service worker
-sw.js                 offline-cache (hæv VERSION ved ændringer)
+glyphs/               knap-tegn skåret ud af screenshots (bruges som CSS-masker)
+ref/                  referencebilleder (udgives ikke)
+scripts/extract-icons.py  laver icons/ og glyphs/ ud fra ref/
+sw.js                 offline-cache, netværk først (hæv VERSION ved ændringer)
 manifest.webmanifest  PWA-manifest
 tests/                node:test
 ```
