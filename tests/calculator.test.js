@@ -52,8 +52,9 @@ test('AC/C-skift og slet', () => {
   assert.equal(main(c), '0');
 });
 
-test('max 9 cifre og eksponent ved store tal', () => {
-  assert.equal(main(run(keys('1234567890123'))), '123.456.789');
+test('lange tal (op til 16 cifre) og eksponent ved store tal', () => {
+  assert.equal(main(run(keys('1234567890123'))), '1.234.567.890.123');
+  assert.equal(main(run(keys('12345678901234567890'))), '1.234.567.890.123.456');
   const c = run(keys('99999999×99999999=×99999999='));
   assert.match(main(c), /e23$/);
 });

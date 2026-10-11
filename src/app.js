@@ -40,7 +40,7 @@ function render() {
   const v = calc.getView();
   elMain.innerHTML = partsHTML(v.main);
   elExpr.innerHTML = v.expr ? partsHTML(v.expr) : '';
-  fit(elMain, 0.62);
+  fit(elMain, 0.76); // målt i ref/3.webp: 83 px mod 109 px
   if (v.expr) fit(elExpr, 0.6);
   elClear.textContent = v.clearLabel;
   document.querySelectorAll('.key.op').forEach((b) => {

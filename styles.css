@@ -129,7 +129,7 @@ svg { display: block; }
   flex-direction: column;
   justify-content: flex-end;
   align-items: stretch;
-  padding: 0 calc(4.4 * var(--u)) calc(2.2 * var(--u));
+  padding: 0 calc(4.4 * var(--u)) calc(2.2 * var(--u)) calc(3.9 * var(--u));
   overflow: hidden;
 }
 .line {
@@ -158,8 +158,9 @@ svg { display: block; }
 .line .op { color: var(--expr-op); }
 .line.expr .op { color: inherit; }
 .line.overflow {
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 calc(10 * var(--u)));
-  mask-image: linear-gradient(to right, transparent 0, #000 calc(10 * var(--u)));
+  /* målt i ref/3.webp: usynlig ved skærmkanten + 3,9 %, fuldt synlig ca. 3,9 % længere inde */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 calc(4 * var(--u)));
+  mask-image: linear-gradient(to right, transparent 0, #000 calc(4 * var(--u)));
 }
 .line.main.bump { animation: bump .18s ease-out; }
 @keyframes bump { from { opacity: .55; } to { opacity: 1; } }

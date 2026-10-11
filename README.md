@@ -57,7 +57,7 @@ Indstillingerne gemmes på telefonen.
 Appen følger med i alt, der tastes. Når tilskueren begynder på det tal, der skal streames, udregner motoren det tal `x`, som får hele udtrykket (med almindeligt regnehierarki: × og ÷ før + og −) til at give målet. **Hvert tryk på en ciffertast viser næste ciffer i `x`** – uanset hvilken tast der blev trykket. Regnestykket på skærmen er dermed ægte hele vejen, og = giver målet.
 
 - Taster tilskueren **færre** cifre end nødvendigt, fuldføres tallet ved =.
-- Taster de **flere**, ignoreres de ekstra tryk (som når man rammer iPhonens grænse på 9 cifre).
+- Taster de **flere**, ignoreres de ekstra tryk.
 - Slet-tast og swipe virker: ét ciffer tilbage, og næste tryk viser det samme ciffer igen.
 - Fortsætter tilskueren med flere tal efter det streamede tal, streames det næste tal også, hvis det kan gøres troværdigt.
 
@@ -106,7 +106,7 @@ For at starte igen: hemmeligt panel → *Force aktiv*.
 
 `npm test` (Node 18+, ingen afhængigheder) – **24 tests, alle grønne**:
 
-**Lommeregner:** dansk formatering (`.`/`,`), regnehierarki, gentaget =, procent som på iPhone (`200+10%` = 220), ±, negative tal i parentes `(-5.634,)×65`, AC/C-skift, slet, max 9 cifre, eksponentvisning (`9,9999997e23`), `Fejl` ved division med 0, fortsat regning efter =.
+**Lommeregner:** dansk formatering (`.`/`,`), regnehierarki, gentaget =, procent som på iPhone (`200+10%` = 220), ±, negative tal i parentes `(-5.634,)×65`, AC/C-skift, slet, lange tal op til 16 cifre (krymper og glider ud til venstre som på iPhone), eksponentvisning (`9,9999997e23`), `Fejl` ved division med 0, fortsat regning efter =.
 
 **Force-motor:** fødselsdato + postnummer → i morgens dato, ciffer-for-ciffer-streaming, slet under streaming, ekstra tryk ignoreres, fuldførelse ved =, Netto-kvittering med decimaler, Lotto-række (7 af 36), × og ÷ med afrunding, gentaget =, gentagelse efter "brugt op", rettet tal, panik, *første tal efter =*, manuel trigger, ret-sidste-tal.
 

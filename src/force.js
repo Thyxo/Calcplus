@@ -1,5 +1,5 @@
 // Force-motoren: udregner hvilket tal der skal "streames" ind, så udtrykket rammer målet.
-import { MAX_DIGITS, formatNumber, parseInput } from './format.js';
+import { MAX_DIGITS, MAX_INPUT_DIGITS, formatNumber, parseInput } from './format.js';
 
 export const OPS = ['+', '-', '×', '÷'];
 
@@ -105,7 +105,7 @@ export function planForce({ prefix = [], op = null, target, tokenNeg = false, ma
     if (rep.value !== 0 && Math.abs(rep.value) < 1) { score += 80; notes.push('tallet starter med 0,'); }
     if (!exact) { score += 20; notes.push('afrundet (resultatet vises som målet)'); }
     if (!close) { score += 2000; notes.push('for stor afrundingsfejl'); }
-    if (rep.intDigits > maxDigits) { score += 400; notes.push(`over ${maxDigits} cifre`); }
+    if (rep.intDigits > MAX_INPUT_DIGITS) { score += 400; notes.push(`over ${MAX_INPUT_DIGITS} cifre`); }
     score += rep.decimals * 2;
     const cand = {
       ok: true, op: o, value: rep.value, text: rep.text, neg: rep.neg,

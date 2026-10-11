@@ -1,5 +1,5 @@
 // Lommeregner-motor uden DOM. UI'et kalder press(key) og tegner getView().
-import { MAX_DIGITS, countDigits, formatInput, formatNumber, opGlyph } from './format.js';
+import { MAX_INPUT_DIGITS, countDigits, formatInput, formatNumber, opGlyph } from './format.js';
 import { evaluate, numValue, planForce } from './force.js';
 import { DEFAULTS, resolveTarget } from './settings.js';
 
@@ -199,7 +199,7 @@ export class Calculator {
     if (tok.pct) return;
     if (!tok.checked) this.maybeStartStream(tok);
     if (this.isStreaming(tok)) return this.reveal(d);
-    if (countDigits(tok.text) >= MAX_DIGITS) return;
+    if (countDigits(tok.text) >= MAX_INPUT_DIGITS) return;
     if (tok.text === '0') tok.text = d;
     else tok.text += d;
   }

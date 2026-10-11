@@ -1,6 +1,10 @@
 // Talformatering efter dansk standard: "." som tusindtalsseparator og "," som decimaltegn.
 
-export const MAX_DIGITS = 9; // samme grænse som iPhone-lommeregneren i portræt
+// Cifre man kan taste i ét tal. iPhone-appen tillader lange tal (teksten krymper og glider ud
+// til venstre); 16 er grænsen for hvad JavaScript kan regne præcist med.
+export const MAX_INPUT_DIGITS = 16;
+// Talstrømmen holder sig til 9 betydende cifre i decimaltal, så tallet ser "tastet" ud.
+export const MAX_DIGITS = 9;
 
 const OP_GLYPH = { '+': '+', '-': '−', '×': '×', '÷': '÷' };
 export const opGlyph = (op) => OP_GLYPH[op] ?? op;
