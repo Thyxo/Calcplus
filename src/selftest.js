@@ -92,7 +92,7 @@ export function runSelfTest({ runs = 2000, seed = 42, now = new Date(2026, 9, 11
     const target = makeTarget(g, now);
     const forcePos = sc.nums.length + 1;
     const calc = new Calculator({
-      settings: { enabled: true, targetMode: 'fixed', target: String(target).replace('.', ','), trigger: 'nth', nth: forcePos, uses: 0, lateFix: true, allowSwap: true },
+      settings: { enabled: true, display: 'stream', targetMode: 'fixed', target: String(target).replace('.', ','), trigger: 'nth', nth: forcePos, uses: 0, lateFix: true, allowSwap: true },
       now: () => now,
     });
     const keys = [];

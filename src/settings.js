@@ -2,6 +2,8 @@ import { parseDisplay } from './format.js';
 
 export const DEFAULTS = {
   enabled: false,        // force til/fra
+  display: 'typed',      // typed = regnestykket viser præcis det tastede, kun resultatet tvinges
+                         // stream = talstrøm: sidste tal udskiftes, så regnestykket passer
   targetMode: 'fixed',   // fixed | tomorrow | today | time
   target: '2100',        // bruges når targetMode = fixed
   timeOffset: 0,         // minutter lagt til ved targetMode = time

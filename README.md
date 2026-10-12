@@ -41,6 +41,7 @@ Ingen build-kommando og ingen output-mappe (roden udgives som den er). `vercel.j
 | Indstilling | Betydning |
 |---|---|
 | **Force aktiv** | Tænd/sluk for force. Slukket = helt almindelig lommeregner. |
+| **Tal på skærmen** | *Som tastet* (standard): regnestykket viser præcis de tal, der blev tastet – kun resultatet bliver målet. *Talstrøm*: sidste tal udskiftes, mens der tastes, så regnestykket regner rigtigt. |
 | **Mål** | *Tal* (fx `2100` eller `147,95`), *I morgen* (DDMMÅÅ), *I dag* (DDMMÅÅ) eller *Klokken* (TTMM + valgfrit antal minutter frem). "Rammer nu" viser det aktuelle mål. |
 | **Start** | Hvornår talstrømmen starter: *Ved tal nr. N*, *Første tal efter =* eller *Manuel* (tryk én gang i det tomme sorte felt øverst i midten). |
 | **N** | Hvilket tal i regnestykket der streames (standard 3). |
@@ -54,7 +55,10 @@ Ingen build-kommando og ingen output-mappe (roden udgives som den er). `vercel.j
 
 Indstillingerne gemmes på telefonen.
 
-### Hvordan "talstrømmen" virker
+### "Som tastet" (standard)
+Tilskueren ser sine egne tal hele vejen, og ved = vises målet. Regnestykket i den grå linje passer altså ikke matematisk (fx `45×12` = `1.628.345.669`). Det opdager man kun, hvis man regner efter. Gentaget = regner videre fra målet. Taster de nøjagtigt samme regnestykke igen, kommer målet igen, også efter force er brugt op. Med *Ret sidste tal ved =* slået til tvinges alle regnestykker med mindst 2 tal, ellers kun dem med mindst N tal.
+
+### Hvordan "talstrømmen" virker (valgfri)
 Appen følger med i alt, der tastes. Når tilskueren begynder på det tal, der skal streames, udregner motoren det tal `x`, som får hele udtrykket (med almindeligt regnehierarki: × og ÷ før + og −) til at give målet. **Hvert tryk på en ciffertast viser næste ciffer i `x`** – uanset hvilken tast der blev trykket. Regnestykket på skærmen er dermed ægte hele vejen, og = giver målet.
 
 - Taster tilskueren **færre** cifre end nødvendigt, fuldføres tallet ved =.

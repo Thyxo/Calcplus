@@ -229,6 +229,7 @@ export class Calculator {
 
   maybeStartStream(tok) {
     tok.checked = true;
+    if (this.settings.display === 'typed') return; // ingen talstrøm: vis præcis det tastede
     const idx = this.tokens.indexOf(tok);
     const numIndex = this.tokens.slice(0, idx).filter((t) => t.t === 'n').length;
     const opTok = idx > 0 ? this.tokens[idx - 1] : null;
@@ -352,7 +353,37 @@ export class Calculator {
   }
 
   // Afslutter force ved "=". Returnerer målet hvis det skal vises, ellers null.
+  // "Som tastet": regnestykket røres ikke, kun resultatet bliver målet.
+  finalizeTyped() {
+    const s = this.settings;
+    const nums = this.tokens.filter((t) => t.t === 'n');
+    const key = 'typed:' + this.tokens.map(tokenKey).join('|');
+    let replay = null;
+    if (this.forceArmed()) {
+      const enough = nums.length >= Math.max(1, s.nth) || (s.lateFix && nums.length >= 2);
+      const ok = s.trigger === 'nth' ? enough
+        : s.trigger === 'afterEquals' ? this.calc.continued && nums.length >= 2
+        : nums.length >= 1; // manuel
+      if (!ok) return null;
+    } else {
+      replay = this.forceRt.memory.get(key);
+      if (!replay) return null;
+    }
+    const target = replay ? replay.target : (this.calc.target ?? this.target());
+    if (replay) {
+      this.log(`Gentagelse: ${tokensText(this.tokens)} giver igen ${formatNumber(target)}`);
+    } else {
+      this.forceRt.hits++;
+      this.forceRt.manualArmed = false;
+      this.forceRt.memory.set(key, { target });
+      const left = s.uses > 0 ? Math.max(0, s.uses - this.forceRt.hits) : '∞';
+      this.log(`RAMT ${formatNumber(target)} – regnestykket vist som tastet: ${tokensText(this.tokens)} (ærligt: ${formatNumber(evaluate(this.tokens))}) – ${left} tilbage`);
+    }
+    return { value: target };
+  }
+
   finalizeForce() {
+    if (this.settings.display === 'typed') return this.finalizeTyped();
     const st = this.calc.stream;
     const s = this.settings;
     const nums = this.tokens.filter((t) => t.t === 'n');

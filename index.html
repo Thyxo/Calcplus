@@ -112,6 +112,11 @@
 
       <h4>Talstrøm</h4>
       <div class="group">
+        <label class="row"><span>Tal på skærmen</span>
+          <select data-s="display">
+            <option value="typed">Som tastet</option>
+            <option value="stream">Talstrøm</option>
+          </select></label>
         <label class="row"><span>Start</span>
           <select data-s="trigger">
             <option value="nth">Ved tal nr. N</option>
@@ -122,7 +127,7 @@
           <select data-s="nth"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
         <label class="row"><span>Antal ramte før stop</span>
           <select data-s="uses"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="0">Ubegrænset</option></select></label>
-        <label class="row"><span>Ret sidste tal ved =</span><input type="checkbox" class="switch" data-s="lateFix"></label>
+        <label class="row"><span>Ret sidste tal ved = / tving med færre tal</span><input type="checkbox" class="switch" data-s="lateFix"></label>
         <label class="row"><span>Tillad operator-skift</span><input type="checkbox" class="switch" data-s="allowSwap"></label>
       </div>
 

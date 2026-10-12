@@ -8,7 +8,8 @@ const keys = (s) => s.split('');
 const main = (c) => c.getView().main.map((p) => p.text).join('');
 const expr = (c) => (c.getView().expr || []).map((p) => p.text).join('');
 const NOW = new Date(2026, 9, 11); // 11. okt 2026 -> i morgen = 121026
-const force = (s = {}) => new Calculator({ settings: { enabled: true, uses: 0, ...s }, now: () => NOW });
+const force = (s = {}) => new Calculator({ settings: { enabled: true, display: 'stream', uses: 0, ...s }, now: () => NOW });
+const typed = (s = {}) => new Calculator({ settings: { enabled: true, display: 'typed', uses: 0, ...s }, now: () => NOW });
 
 test('fødselsdato + postnummer + tilfældigt tal = i morgens dato', () => {
   const c = force({ targetMode: 'tomorrow', nth: 3 });
@@ -137,6 +138,36 @@ test('planner vælger mest troværdige løsning', () => {
   const q = planForce({ prefix: [{ t: 'n', text: '100' }], op: '+', target: 100, allowSwap: false });
   assert.equal(q.ok, true);
   assert.ok(q.score >= 500); // 0 er mistænkeligt
+});
+
+test('som tastet: regnestykket viser præcis det tastede, kun resultatet er målet', () => {
+  const c = typed({ target: '1628345669', nth: 2 });
+  c.pressAll([...keys('45×12'), '=']);
+  assert.equal(main(c), '1.628.345.669');
+  assert.equal(expr(c), '45×12');
+  c.press('='); // gentaget = regner videre fra målet
+  assert.equal(main(c), '19.540.148.028');
+});
+
+test('som tastet: samme regnestykke igen giver målet, også efter brugt op; andet er ærligt', () => {
+  const c = typed({ target: '2100', nth: 2, uses: 1 });
+  c.pressAll([...keys('240387+55'), '=']);
+  assert.equal(main(c), '2.100');
+  c.pressAll(['clear', ...keys('240387+55'), '=']);
+  assert.equal(main(c), '2.100');
+  c.pressAll(['clear', ...keys('240387+56'), '=']);
+  assert.equal(main(c), '240.443');
+});
+
+test('som tastet: færre tal end N og ingen "ret ved =" er ærligt; ét tal alene er altid ærligt', () => {
+  let c = typed({ target: '2100', nth: 3, lateFix: false });
+  c.pressAll([...keys('5+5'), '=']);
+  assert.equal(main(c), '10');
+  c = typed({ target: '2100', nth: 3, lateFix: true });
+  c.pressAll([...keys('5+5'), '=']);
+  assert.equal(main(c), '2.100');
+  c.pressAll(['clear', ...keys('7'), '=']);
+  assert.equal(main(c), '7');
 });
 
 test('randomiseret: 20.000 regnestykker mod mange mål', () => {
