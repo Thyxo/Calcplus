@@ -52,13 +52,19 @@ function render() {
 
 // ---------- taster ----------
 const pressedEls = new Set();
+const drags = new Map(); // pointerId -> { btn, x, y }
 function press(el) {
   el.classList.add('pressed');
   pressedEls.add(el);
 }
+function resetStretch(el) {
+  el.classList.remove('drag');
+  ['--tx', '--ty', '--s', '--ex', '--ey'].forEach((p) => el.style.removeProperty(p));
+}
 function releaseAll() {
-  pressedEls.forEach((el) => el.classList.remove('pressed'));
+  pressedEls.forEach((el) => { el.classList.remove('pressed'); resetStretch(el); });
   pressedEls.clear();
+  drags.clear();
 }
 document.addEventListener('pointerup', releaseAll);
 document.addEventListener('pointercancel', releaseAll);
@@ -68,9 +74,32 @@ $('#keypad').addEventListener('pointerdown', (e) => {
   if (!btn) return;
   e.preventDefault();
   hideBubble();
+  try { btn.setPointerCapture(e.pointerId); } catch { /* ok */ }
+  drags.set(e.pointerId, { btn, x: e.clientX, y: e.clientY });
   press(btn);
   calc.press(btn.dataset.key);
   render();
+});
+
+// Knappen strækker sig mod fingeren, når man trækker (målt: 8-tallet blev 1,09 × 1,27 og flyttet ned)
+$('#keypad').addEventListener('pointermove', (e) => {
+  const d = drags.get(e.pointerId);
+  if (!d) return;
+  const size = d.btn.offsetWidth;
+  const lim = (v) => Math.max(-0.6, Math.min(0.6, v / size));
+  const nx = lim(e.clientX - d.x);
+  const ny = lim(e.clientY - d.y);
+  const ax = Math.abs(nx);
+  const ay = Math.abs(ny);
+  d.btn.classList.add('drag');
+  d.btn.style.setProperty('--tx', nx * 0.3 * size + 'px');
+  d.btn.style.setProperty('--ty', ny * 0.3 * size + 'px');
+  const sx = 1.19 + 0.25 * ax - 0.28 * ay;
+  const sy = 1.19 + 0.25 * ay - 0.28 * ax;
+  const k = Math.min(sx, sy); // ensartet skalering + længere kasse = kapsel med lige sider
+  d.btn.style.setProperty('--s', k.toFixed(3));
+  d.btn.style.setProperty('--ex', (sx / k).toFixed(3));
+  d.btn.style.setProperty('--ey', (sy / k).toFixed(3));
 });
 $('#keypad').addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -266,6 +295,7 @@ function syncPanel() {
   $('#row-nth').hidden = settings.trigger !== 'nth';
   $('#s-target').textContent = formatNumber(resolveTarget(settings));
   $('#s-status').textContent = statusText();
+  $('#s-screen').textContent = screenInfo();
   renderLog();
 }
 
@@ -278,6 +308,7 @@ function update(patch) {
   settings = { ...settings, ...patch };
   saveSettings(settings);
   calc.setSettings(patch);
+  if ('vAdjust' in patch) fixHeight();
   syncPanel();
 }
 
@@ -286,7 +317,7 @@ secret.addEventListener('change', (e) => {
   if (!el) return;
   const key = el.dataset.s;
   let v = el.type === 'checkbox' ? el.checked : el.value;
-  if (['nth', 'uses', 'timeOffset'].includes(key)) v = Number(v) || 0;
+  if (['nth', 'uses', 'timeOffset', 'vAdjust'].includes(key)) v = Number(v) || 0;
   update({ [key]: v });
 });
 secret.addEventListener('input', (e) => {
@@ -306,6 +337,32 @@ $('#s-selftest').addEventListener('click', async () => {
   const { runSelfTest, formatReport } = await import('./selftest.js');
   out.textContent = formatReport(runSelfTest({ runs: 2000, seed: Date.now() % 100000, now: new Date() }));
 });
+
+// ---------- højde: iOS-fejl i hjemmeskærm-apps ----------
+// I standalone-tilstand melder iOS en sidehøjde, der er statuslinjens højde (59 pt) for kort,
+// selvom siden tegnes over hele skærmen. Så sad alt 59 pt for højt. Vi bruger skærmens højde.
+const isStandalone = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+let heightFixed = false;
+function fixHeight() {
+  const portrait = innerHeight > innerWidth;
+  heightFixed = isStandalone() && portrait && screen.height > innerHeight + 20;
+  app.style.height = heightFixed ? screen.height + 'px' : '';
+  app.style.bottom = heightFixed ? 'auto' : '';
+  app.style.setProperty('--v-adjust', (Number(settings.vAdjust) || 0) + 'px');
+}
+fixHeight();
+window.addEventListener('resize', fixHeight);
+window.addEventListener('orientationchange', () => setTimeout(fixHeight, 300));
+
+function screenInfo() {
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:env(safe-area-inset-top);bottom:env(safe-area-inset-bottom)';
+  document.body.appendChild(probe);
+  const st = getComputedStyle(probe);
+  const info = `vindue ${innerWidth}×${innerHeight}, skærm ${screen.width}×${screen.height}, safe ${parseFloat(st.top) || 0}/${parseFloat(st.bottom) || 0}, ${isStandalone() ? 'hjemmeskærm' : 'browser'}${heightFixed ? ', højde rettet' : ''}`;
+  probe.remove();
+  return info;
+}
 
 // ---------- diverse iOS-finesser ----------
 document.addEventListener('gesturestart', (e) => e.preventDefault());

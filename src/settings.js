@@ -12,6 +12,7 @@ export const DEFAULTS = {
   allowSwap: true,       // må motoren skifte operator, hvis det er eneste troværdige løsning
   opHighlight: true,     // markér valgt operator (hvid knap, orange tegn)
   indicator: true,       // diskret prik når force er klar
+  vAdjust: 0,            // lodret finjustering af tastaturet i px (positiv = højere op)
 };
 
 const pad = (n) => String(n).padStart(2, '0');

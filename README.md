@@ -47,6 +47,7 @@ Ingen build-kommando og ingen output-mappe (roden udgives som den er). `vercel.j
 | **Antal ramte før stop** | Force slår sig selv fra efter så mange ramte (standard 3). Gentagelser huskes stadig (se nedenfor). |
 | **Ret sidste tal ved =** | Hvis tilskueren trykker = før talstrømmen nåede at starte, rettes sidste tal i stedet. |
 | **Tillad operator-skift** | Hvis målet er mindre end summen, må `+` blive til `−` (eneste troværdige løsning). |
+| **Lodret justering** | Finjustér tastaturets højde i px (+ = op), hvis det ikke sidder præcist på din telefon. Linjen *Skærm* viser de mål, telefonen melder. |
 | **Diskret prik** | En næsten usynlig mørkegrå prik øverst i midten, når force er klar. |
 | **Kør selvtest** | Kører 2.000 tilfældige regnestykker direkte på telefonen og viser resultatet. |
 | **Log** | Hvad motoren har gjort (startet talstrøm, skiftet operator, afrundet osv.). |
@@ -101,6 +102,10 @@ For at starte igen: hemmeligt panel → *Force aktiv*.
 - **Idé til senere:** sæt målet live fra en anden telefon via WebSocket/SSE. Det kræver en lille Node-server (fx på Railway) – ikke bygget endnu.
 
 ---
+
+## Udseende-detaljer
+- **Tryk-effekt som iOS 26:** knappen vokser til 1,19×, lysner (#343434 → ca. #737373), kaster skygge på nabo-knapperne og fjedrer tilbage. Trækker man fingeren, strækker den sig mod fingeren som en kapsel. Målt fra skærmbilleder af den rigtige app.
+- **Højde-rettelse:** iOS melder en for lav sidehøjde i hjemmeskærm-apps (statuslinjens 59 pt mangler), så alt sad for højt. Appen bruger nu skærmens fulde højde, når den kører fra hjemmeskærmen.
 
 ## 5. Hvad er testet
 
