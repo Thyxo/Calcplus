@@ -155,3 +155,19 @@ sw.js                 offline-cache, netværk først (hæv VERSION ved ændringe
 manifest.webmanifest  PWA-manifest
 tests/                node:test
 ```
+
+## Forbindelse til Noter+ (Cryptext)
+
+Lommeregneren kan forbindes med [Noter+](https://noterplus.vercel.app) via et lille relæ på Railway (`https://relay-production-03f5.up.railway.app`).
+
+Sådan forbinder du: panel → **Forbindelse til Noter+** → skriv samme kode som i Noter+.
+
+| Funktion | Hvad sker der |
+|---|---|
+| **Modtag mål fra Noter** | Et navn, der er regnet om til et tal (Cryptext), eller et fast tal fra Noter+ bliver straks målet. Force slås til, og tælleren nulstilles |
+| **Send resultater til Noter** | Hvert `=` sendes til Noter+. Noten kan vise resultatet |
+| **Navn (Cryptext)** | Skriv navnet her i stedet. Lommeregneren bruger den bogstav-tabel, Noter+ har sendt |
+
+Ændrer du målet her, følger Noter+ med.
+
+`src/link.js`, `src/crypt.js` og `src/known.js` er kopier fra Noter+. Ret dem dér, og kopiér dem hertil. Se README i Thyxo/NoterPlus.
