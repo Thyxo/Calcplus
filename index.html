@@ -110,6 +110,17 @@
         <div class="row"><span>Rammer nu</span><span id="s-target" class="strong"></span></div>
       </div>
 
+      <h4>Forbindelse til Noter+</h4>
+      <div class="group">
+        <label class="row"><span>Kode</span><input type="text" data-s="link" placeholder="samme kode som i Noter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></label>
+        <div class="row"><span>Status</span><span id="s-link" class="muted"></span></div>
+        <label class="row"><span>Modtag mål fra Noter</span><input type="checkbox" class="switch" data-s="linkIn"></label>
+        <label class="row"><span>Send resultater til Noter</span><input type="checkbox" class="switch" data-s="linkOut"></label>
+        <label class="row"><span>Navn (Cryptext)</span><input type="text" id="s-name" placeholder="fx Lise" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done"></label>
+        <div class="row"><span>Bliver til</span><span id="s-name-out" class="strong">–</span></div>
+        <button class="row btn" id="s-name-use">Brug navnet som mål</button>
+      </div>
+
       <h4>Talstrøm</h4>
       <div class="group">
         <label class="row"><span>Tal på skærmen</span>

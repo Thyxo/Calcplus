@@ -15,6 +15,10 @@ export const DEFAULTS = {
   opHighlight: true,     // markér valgt operator (hvid knap, orange tegn)
   indicator: true,       // diskret prik når force er klar
   vAdjust: 0,            // lodret finjustering af tastaturet i px (positiv = højere op)
+  link: '',              // rum-kode til Noter+ (samme kode i begge apps)
+  linkIn: true,          // modtag mål (navn/tal) fra Noter+
+  linkOut: true,         // send resultater og egne mål til Noter+
+  forceAt: 0,            // tidsstempel for sidst modtagne/sendte mål
 };
 
 const pad = (n) => String(n).padStart(2, '0');

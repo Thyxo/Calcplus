@@ -1,6 +1,8 @@
 import { Calculator } from './calculator.js';
 import { formatNumber, parseDisplay } from './format.js';
 import { loadSettings, resolveTarget, saveSettings } from './settings.js';
+import { createLink, cleanRoom } from './link.js';
+import { planName } from './crypt.js';
 
 const $ = (sel) => document.querySelector(sel);
 const app = $('#app');
@@ -51,6 +53,13 @@ function render() {
 }
 
 // ---------- taster ----------
+function pressKey(k) {
+  const hits = calc.forceRt.hits;
+  calc.press(k);
+  render();
+  if (k === '=') sendResult(calc.forceRt.hits > hits);
+}
+
 const pressedEls = new Set();
 const drags = new Map(); // pointerId -> { btn, x, y }
 function press(el) {
@@ -77,8 +86,7 @@ $('#keypad').addEventListener('pointerdown', (e) => {
   try { btn.setPointerCapture(e.pointerId); } catch { /* ok */ }
   drags.set(e.pointerId, { btn, x: e.clientX, y: e.clientY });
   press(btn);
-  calc.press(btn.dataset.key);
-  render();
+  pressKey(btn.dataset.key);
 });
 
 // Knappen strækker sig mod fingeren, når man trækker (målt: 8-tallet blev 1,09 × 1,27 og flyttet ned)
@@ -113,8 +121,7 @@ document.addEventListener('keydown', (e) => {
   e.preventDefault();
   const btn = document.querySelector(`.key[data-key="${CSS.escape(k)}"]`);
   if (btn) { press(btn); setTimeout(releaseAll, 90); }
-  calc.press(k);
-  render();
+  pressKey(k);
 });
 
 // ---------- display: swipe for at slette, hold for at kopiere ----------
@@ -296,6 +303,7 @@ function syncPanel() {
   $('#s-target').textContent = formatNumber(resolveTarget(settings));
   $('#s-status').textContent = statusText();
   $('#s-screen').textContent = screenInfo();
+  syncLinkStatus();
   renderLog();
 }
 
@@ -309,6 +317,8 @@ function update(patch) {
   saveSettings(settings);
   calc.setSettings(patch);
   if ('vAdjust' in patch) fixHeight();
+  if ('link' in patch) startLink();
+  if (('target' in patch || 'targetMode' in patch || 'timeOffset' in patch)) sendTarget();
   syncPanel();
 }
 
@@ -328,6 +338,86 @@ secret.querySelectorAll('[data-s-seg] button').forEach((b) => b.addEventListener
   update({ [b.parentElement.dataset.sSeg]: b.dataset.v });
 }));
 $('#s-reset').addEventListener('click', () => { calc.resetHits(); syncPanel(); });
+$('#s-name-use').addEventListener('click', () => useName($('#s-name').value));
+$('#s-name').addEventListener('input', () => previewName($('#s-name').value));
+$('#s-name').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); useName(e.target.value); e.target.blur(); } });
+
+// ---------- forbindelse til Noter+ (relæ på Railway) ----------
+// Noter+ sender et mål (navn → tal med Cryptext, eller et fast tal); lommeregneren sender
+// sine resultater tilbage, så noten kan vise dem. Uden kode/net er alt som før.
+let link = null;
+let linkStatus = 'off';
+const LINK_TEXT = { off: 'Ingen kode', connecting: 'Forbinder …', online: 'Forbundet', offline: 'Offline – sender senere' };
+
+function startLink() {
+  link?.close();
+  link = null;
+  const room = cleanRoom(settings.link);
+  if (room.length < 3) { linkStatus = 'off'; syncLinkStatus(); return; }
+  link = createLink({ room, storeKey: 'cp.pending', onState: onRemote, onStatus: (st) => { linkStatus = st; syncLinkStatus(); } });
+}
+
+function syncLinkStatus() {
+  const el = $('#s-link');
+  if (el) { el.textContent = LINK_TEXT[linkStatus] || linkStatus; el.dataset.s = linkStatus; }
+}
+
+function onRemote(st) {
+  if (st.cmap) { try { localStorage.setItem('cp.cmap', JSON.stringify(st.cmap)); } catch { /* ok */ } }
+  const f = st.force;
+  if (settings.linkIn && f && f.by !== 'calc' && f.digits && f.at > (settings.forceAt || 0)) {
+    settings = { ...settings, targetMode: 'fixed', target: f.digits, enabled: true, forceAt: f.at };
+    saveSettings(settings);
+    calc.setSettings({ targetMode: 'fixed', target: f.digits, enabled: true });
+    calc.resetHits();
+    calc.log(`Mål fra Noter: ${formatNumber(Number(f.digits))}${f.name ? ` (${f.name})` : ''}`);
+    if (!secret.hidden) syncPanel();
+    render();
+  }
+}
+
+function sendResult(forced) {
+  if (!link || !settings.linkOut) return;
+  const text = calc.getView().main.map((p) => p.text).join('');
+  if (!text || text === 'Fejl') return;
+  link.publish({ result: { value: text, forced, at: Date.now() } });
+}
+
+function sendTarget() {
+  if (!link || !settings.linkOut) return;
+  const digits = String(resolveTarget(settings)).replace(/\D/g, '');
+  if (!digits) return;
+  const at = Date.now();
+  settings.forceAt = at;
+  saveSettings(settings);
+  link.publish({ force: { digits, name: null, by: 'calc', at } });
+}
+
+function namePlan(name) {
+  let cmap = null;
+  try { cmap = JSON.parse(localStorage.getItem('cp.cmap') || 'null'); } catch { cmap = null; }
+  return planName(name, cmap ? { font: cmap.font, map: cmap.map || {}, preferDigits: cmap.preferDigits, caseMode: cmap.caseMode || 'title', scores: cmap.scores || {} } : { font: false, caseMode: 'upper' });
+}
+
+function previewName(name) {
+  const p = namePlan(name);
+  $('#s-name-out').textContent = p.digits ? `${formatNumber(Number(p.digits))}${p.complete ? '' : ' (mangler bogstaver)'}` : '–';
+}
+
+function useName(name) {
+  const p = namePlan(name);
+  if (!p.digits || !p.complete) { previewName(name); return; }
+  const at = Date.now();
+  settings = { ...settings, targetMode: 'fixed', target: p.digits, enabled: true, forceAt: at };
+  saveSettings(settings);
+  calc.setSettings({ targetMode: 'fixed', target: p.digits, enabled: true });
+  calc.resetHits();
+  calc.log(`Mål fra navn: ${p.name} → ${formatNumber(Number(p.digits))}`);
+  link?.publish({ force: { digits: p.digits, name: p.name, by: 'calc', at } });
+  syncPanel();
+}
+
+startLink();
 $('#s-panic').addEventListener('click', () => doPanic());
 $('#s-selftest').addEventListener('click', async () => {
   const out = $('#s-selftest-out');
