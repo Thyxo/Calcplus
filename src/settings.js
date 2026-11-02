@@ -19,6 +19,7 @@ export const DEFAULTS = {
   linkIn: true,          // modtag mål (navn/tal) fra Noter+
   linkOut: true,         // send resultater og egne mål til Noter+
   forceAt: 0,            // tidsstempel for sidst modtagne/sendte mål
+  targetSrc: '',         // hvor målet kom fra (fx "Fra Noter+: Lise"); tom = tastet i panelet
 };
 
 const pad = (n) => String(n).padStart(2, '0');

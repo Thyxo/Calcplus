@@ -344,9 +344,7 @@ svg { display: block; }
   width: 100%;
   margin: 0 auto;
 }
-.secret h4 { color: #8d8d92; font-weight: 400; font-size: 13px; text-transform: uppercase; margin: 22px 16px 7px; letter-spacing: .02em; }
-.group { background: #1c1c1e; border-radius: 12px; overflow: hidden; margin-top: 14px; }
-.secret h4 + .group { margin-top: 0; }
+.group { background: #1c1c1e; border-radius: 12px; overflow: hidden; }
 .row {
   display: flex;
   align-items: center;
@@ -419,7 +417,133 @@ svg { display: block; }
   margin: 0;
 }
 #s-selftest-out { margin-top: 14px; }
-.foot { color: #636366; font-size: 12px; margin: 16px; text-align: center; }
+.foot { color: #636366; font-size: 12px; margin: 14px 16px 0; text-align: center; }
+
+/* ---------- hemmeligt panel: overblik + sektioner ---------- */
+.secret-body { padding-top: 0; }
+.secret .sheet-head { border-bottom: 0.5px solid #1f1f1f; }
+
+.hero {
+  margin: 12px 0 10px;
+  padding: 14px 16px 12px;
+  border-radius: 18px;
+  background: #1c1c1e;
+  border: 1px solid transparent;
+  transition: border-color .2s, background .2s;
+}
+.hero.on { border-color: rgba(255, 159, 10, .45); background: linear-gradient(180deg, rgba(255, 159, 10, .12), #1c1c1e 70%); }
+.hero-row { display: flex; align-items: center; gap: 12px; }
+.hero-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.hero-label { font-size: 13px; color: #8d8d92; }
+.hero-num { font-size: 40px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: .3px; overflow: hidden; text-overflow: ellipsis; }
+.hero-sw { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #8d8d92; }
+.hero-status { margin: 6px 0 0; font-size: 14px; color: #c7c7cc; }
+.hero.on .hero-status { color: #ff9f0a; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 12px;
+  background: #2c2c2e;
+  color: #c7c7cc;
+  font-size: 12.5px;
+}
+#chip-src { padding-left: 10px; }
+
+.dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #636366; }
+[data-st="online"] .dot { background: #30d158; box-shadow: 0 0 0 3px rgba(48, 209, 88, .22); }
+[data-st="connecting"] .dot { background: #ffd60a; animation: pulse 1.2s ease-in-out infinite; }
+[data-st="waiting"] .dot { background: #0a84ff; animation: pulse 1.6s ease-in-out infinite; }
+[data-st="offline"] .dot { background: #ff9f0a; }
+@keyframes pulse { 50% { opacity: .3; } }
+
+.sec { margin-bottom: 8px; border-radius: 16px; background: #1c1c1e; overflow: hidden; }
+.sec > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 8px 14px 8px 10px;
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.sec > summary::-webkit-details-marker { display: none; }
+.sec > summary:active { background: #2c2c2e; }
+.sec-ico { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--c); color: #fff; }
+.sec-ico svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sec-t { font-size: 17px; font-weight: 600; white-space: nowrap; }
+.sec-v {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 15px;
+  color: #8d8d92;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sec-v > span { overflow: hidden; text-overflow: ellipsis; }
+.chev { flex: none; width: 8px; height: 8px; border: solid #636366; border-width: 2px 2px 0 0; transform: rotate(135deg); margin: -4px 2px 0; transition: transform .22s; }
+.sec[open] > summary .chev { transform: rotate(-45deg); margin-top: 4px; }
+.sec[open] > summary { border-bottom: 0.5px solid #2c2c2e; }
+.sec[open] > summary .sec-v { opacity: 0; }
+.sec-body { padding: 10px; }
+.sec-body .group { background: #2c2c2e; }
+.sec-body .group .row { border-bottom-color: #3a3a3c; padding: 8px 12px; min-height: 44px; }
+.sec-body .seg { background: #2c2c2e; margin-bottom: 10px; }
+.sec-body .seg button.on { background: #636366; }
+.sec-body .group + .group, .sec-body .group + pre, .sec-body .link-card + .group { margin-top: 10px; }
+.sub-note { margin: 12px 4px 6px; font-size: 12.5px; color: #8d8d92; }
+.sec-body #s-log, .sec-body #s-selftest-out { background: #2c2c2e; }
+.row[hidden] { display: none; }
+
+.link-card { margin-bottom: 10px; padding: 14px 14px 12px; border-radius: 14px; background: #2c2c2e; text-align: center; }
+.lk-state { display: inline-flex; align-items: center; gap: 8px; font-size: 17px; }
+.lk-state b { font-weight: 600; }
+[data-st="online"] .lk-state b { color: #30d158; }
+[data-st="waiting"] .lk-state b { color: #0a84ff; }
+[data-st="offline"] .lk-state b { color: #ff9f0a; }
+.lk-peer { margin: 4px 0 0; font-size: 13px; color: #8d8d92; min-height: 17px; }
+.lk-code { display: block; margin: 12px 0 10px; padding: 8px 10px 10px; border-radius: 12px; background: #1c1c1e; }
+.lk-code span { display: block; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: #8d8d92; }
+.lk-code input {
+  width: 100%;
+  border: 0;
+  background: none;
+  outline: none;
+  text-align: center;
+  font: 600 28px/1.2 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 6px;
+  color: #fff;
+  text-transform: lowercase;
+}
+.lk-code input::placeholder { color: #48484a; letter-spacing: 4px; }
+.lk-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lk-actions button { padding: 10px; border-radius: 12px; background: #1c1c1e; color: #ff9f0a; font-size: 15px; font-weight: 600; }
+.lk-actions button:active { opacity: .6; }
+.lk-hint { margin: 10px 0 0; font-size: 12.5px; line-height: 1.4; color: #8d8d92; }
+.lk-hint b { color: #fff; }
+
+.panic {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 15px;
+  border-radius: 14px;
+  background: rgba(255, 69, 58, .16);
+  color: #ff453a;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.panic:active { background: rgba(255, 69, 58, .32); }
 
 /* Landskab / desktop: centrér */
 @media (min-width: 481px) {

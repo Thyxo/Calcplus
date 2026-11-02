@@ -1,6 +1,6 @@
 // Service worker: alt caches ved installation, så appen virker 100 % offline.
 // Hæv VERSION ved ændringer, så telefonen henter den nye udgave.
-const VERSION = 'calcplus-v6';
+const VERSION = 'calcplus-v7';
 const ASSETS = [
   './',
   'index.html',

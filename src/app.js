@@ -288,6 +288,22 @@ function statusText() {
   return `Klar – ${left}`;
 }
 
+const LBL = (sel) => secret.querySelector(sel)?.selectedOptions?.[0]?.textContent || '';
+
+// Kort resumé på hver lukket sektion
+function syncSummaries() {
+  const s = settings;
+  const mode = { fixed: 'Tal', tomorrow: 'I morgen', today: 'I dag', time: 'Klokken' }[s.targetMode];
+  $('#sum-target').textContent = s.targetMode === 'fixed' ? formatNumber(resolveTarget(s)) : mode;
+  const start = s.trigger === 'nth' ? `tal nr. ${s.nth}` : s.trigger === 'afterEquals' ? 'efter =' : 'manuel';
+  $('#sum-stream').textContent = `${s.display === 'stream' ? 'Talstrøm' : 'Som tastet'} · ${start}`;
+  $('#sum-look').textContent = [s.opHighlight && 'Operator', s.indicator && 'Prik'].filter(Boolean).join(' · ') || 'Intet';
+  const src = $('#chip-src');
+  src.hidden = !s.targetSrc;
+  src.textContent = s.targetSrc || '';
+  $('#hero').classList.toggle('on', !!s.enabled);
+}
+
 function syncPanel() {
   secret.querySelectorAll('[data-s]').forEach((el) => {
     const v = settings[el.dataset.s];
@@ -300,10 +316,13 @@ function syncPanel() {
   $('#row-target').hidden = settings.targetMode !== 'fixed';
   $('#row-offset').hidden = settings.targetMode !== 'time';
   $('#row-nth').hidden = settings.trigger !== 'nth';
+  $('#row-auto').hidden = settings.targetMode === 'fixed';
+  $('#s-auto').textContent = formatNumber(resolveTarget(settings));
   $('#s-target').textContent = formatNumber(resolveTarget(settings));
   $('#s-status').textContent = statusText();
-  $('#s-screen').textContent = screenInfo();
+  $('#s-screen').textContent = `Skærm: ${screenInfo()}`;
   syncLinkStatus();
+  syncSummaries();
   renderLog();
 }
 
@@ -313,6 +332,8 @@ function renderLog() {
 }
 
 function update(patch) {
+  // Målet ændret i hånden: det kommer ikke længere fra Noter+ eller et navn
+  if ('target' in patch || 'targetMode' in patch) patch = { ...patch, targetSrc: '' };
   settings = { ...settings, ...patch };
   saveSettings(settings);
   calc.setSettings(patch);
@@ -328,11 +349,19 @@ secret.addEventListener('change', (e) => {
   const key = el.dataset.s;
   let v = el.type === 'checkbox' ? el.checked : el.value;
   if (['nth', 'uses', 'timeOffset', 'vAdjust'].includes(key)) v = Number(v) || 0;
+  if (key === 'link') { v = cleanRoom(v); el.value = v; }
   update({ [key]: v });
 });
 secret.addEventListener('input', (e) => {
   const el = e.target.closest('input[data-s="target"]');
-  if (el) { settings.target = el.value; calc.setSettings({ target: el.value }); $('#s-target').textContent = formatNumber(resolveTarget(settings)); saveSettings(settings); }
+  if (el) {
+    settings.target = el.value;
+    settings.targetSrc = '';
+    calc.setSettings({ target: el.value });
+    $('#s-target').textContent = formatNumber(resolveTarget(settings));
+    saveSettings(settings);
+    syncSummaries();
+  }
 });
 secret.querySelectorAll('[data-s-seg] button').forEach((b) => b.addEventListener('click', () => {
   update({ [b.parentElement.dataset.sSeg]: b.dataset.v });
@@ -347,26 +376,67 @@ $('#s-name').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.pre
 // sine resultater tilbage, så noten kan vise dem. Uden kode/net er alt som før.
 let link = null;
 let linkStatus = 'off';
-const LINK_TEXT = { off: 'Ingen kode', connecting: 'Forbinder …', online: 'Forbundet', offline: 'Offline – sender senere' };
+let peerSeen = 0; // hvornår Noter+ sidst meldte sig i rummet
 
 function startLink() {
   link?.close();
   link = null;
+  peerSeen = 0;
   const room = cleanRoom(settings.link);
   if (room.length < 3) { linkStatus = 'off'; syncLinkStatus(); return; }
-  link = createLink({ room, storeKey: 'cp.pending', onState: onRemote, onStatus: (st) => { linkStatus = st; syncLinkStatus(); } });
+  link = createLink({
+    room,
+    storeKey: 'cp.pending',
+    onState: onRemote,
+    onStatus: (st) => {
+      linkStatus = st;
+      // Fortæl Noter+, at lommeregneren er i rummet
+      if (st === 'online') link?.publish({ hiCalc: { at: Date.now() } });
+      syncLinkStatus();
+    },
+  });
+}
+
+const two = (n) => String(n).padStart(2, '0');
+function ago(at) {
+  const sec = Math.max(0, Math.round((Date.now() - at) / 1000));
+  if (sec < 60) return 'lige nu';
+  if (sec < 3600) return `for ${Math.round(sec / 60)} min. siden`;
+  const d = new Date(at);
+  if (sec < 86400) return `kl. ${two(d.getHours())}.${two(d.getMinutes())}`;
+  return 'for over et døgn siden';
+}
+
+// Samlet tilstand: relæet + om Noter+ har meldt sig i rummet
+function linkView() {
+  if (linkStatus === 'off') return { s: 'off', text: 'Ingen kode', short: 'Ingen kode', peer: 'Skriv koden fra Noter+.' };
+  if (linkStatus === 'connecting') return { s: 'connecting', text: 'Forbinder …', short: 'Forbinder', peer: '' };
+  if (linkStatus === 'offline') return { s: 'offline', text: 'Offline', short: 'Offline', peer: 'Resultater sendes, når der er net igen.' };
+  if (!peerSeen) return { s: 'waiting', text: 'Venter på Noter+', short: 'Venter', peer: 'Tjek at koden er den samme i Noter+.' };
+  return { s: 'online', text: 'Forbundet', short: 'Forbundet', peer: `Noter+ sidst set ${ago(peerSeen)}` };
 }
 
 function syncLinkStatus() {
-  const el = $('#s-link');
-  if (el) { el.textContent = LINK_TEXT[linkStatus] || linkStatus; el.dataset.s = linkStatus; }
+  const v = linkView();
+  const room = cleanRoom(settings.link);
+  $('#s-link').textContent = v.text;
+  $('#s-peer').textContent = v.peer;
+  $('#link-card').dataset.st = v.s;
+  const sum = $('#sum-link');
+  sum.dataset.st = v.s;
+  sum.querySelector('span').textContent = v.s === 'off' ? v.short : `${room} · ${v.short}`;
+  const chip = $('#chip-link');
+  chip.dataset.st = v.s;
+  chip.querySelector('span').textContent = v.s === 'online' ? 'Noter+' : v.s === 'off' ? 'Ingen forbindelse' : `Noter+: ${v.short}`;
 }
 
 function onRemote(st) {
+  const seen = Math.max(st.hiNotes?.at || 0, st.force?.by === 'notes' ? st.force.at : 0, st.cmap?.at || 0);
+  if (seen > peerSeen) { peerSeen = seen; if (!secret.hidden) syncLinkStatus(); }
   if (st.cmap) { try { localStorage.setItem('cp.cmap', JSON.stringify(st.cmap)); } catch { /* ok */ } }
   const f = st.force;
   if (settings.linkIn && f && f.by !== 'calc' && f.digits && f.at > (settings.forceAt || 0)) {
-    settings = { ...settings, targetMode: 'fixed', target: f.digits, enabled: true, forceAt: f.at };
+    settings = { ...settings, targetMode: 'fixed', target: f.digits, enabled: true, forceAt: f.at, targetSrc: `Fra Noter+${f.name ? `: ${f.name}` : ''}` };
     saveSettings(settings);
     calc.setSettings({ targetMode: 'fixed', target: f.digits, enabled: true });
     calc.resetHits();
@@ -408,7 +478,7 @@ function useName(name) {
   const p = namePlan(name);
   if (!p.digits || !p.complete) { previewName(name); return; }
   const at = Date.now();
-  settings = { ...settings, targetMode: 'fixed', target: p.digits, enabled: true, forceAt: at };
+  settings = { ...settings, targetMode: 'fixed', target: p.digits, enabled: true, forceAt: at, targetSrc: `Navn: ${p.name}` };
   saveSettings(settings);
   calc.setSettings({ targetMode: 'fixed', target: p.digits, enabled: true });
   calc.resetHits();
@@ -416,6 +486,33 @@ function useName(name) {
   link?.publish({ force: { digits: p.digits, name: p.name, by: 'calc', at } });
   syncPanel();
 }
+
+// Sektioner: husk hvilke der er åbne
+const OPEN_KEY = 'cp.open.v1';
+let openSecs = {};
+try { openSecs = JSON.parse(localStorage.getItem(OPEN_KEY) || '{}'); } catch { openSecs = {}; }
+secret.querySelectorAll('details[data-sec]').forEach((d) => {
+  if (d.dataset.sec in openSecs) d.open = openSecs[d.dataset.sec];
+  d.addEventListener('toggle', () => {
+    openSecs[d.dataset.sec] = d.open;
+    try { localStorage.setItem(OPEN_KEY, JSON.stringify(openSecs)); } catch { /* ok */ }
+  });
+});
+// Tryk på forbindelses-mærket: åbn og vis sektionen
+$('#chip-link').addEventListener('click', () => {
+  const d = secret.querySelector('details[data-sec="link"]');
+  d.open = true;
+  d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+$('#s-code').addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
+$('#s-code-paste').addEventListener('click', async () => {
+  try {
+    const code = cleanRoom(await navigator.clipboard.readText());
+    if (code.length >= 3) update({ link: code });
+  } catch { /* ingen adgang til udklipsholderen */ }
+});
+$('#s-code-clear').addEventListener('click', () => update({ link: '' }));
 
 startLink();
 $('#s-panic').addEventListener('click', () => doPanic());

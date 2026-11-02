@@ -38,6 +38,8 @@ Ingen build-kommando og ingen output-mappe (roden udgives som den er). `vercel.j
 
 **Hemmelig adgang:** tryk **5 gange hurtigt** i øverste højre hjørne (på eller lige under lommeregner-knappen, inden for 2½ sekund). Indstillingspanelet åbner.
 
+Øverst står et **overblik**: målet ("Rammer nu"), kontakten *Force*, status og mærker for forbindelsen og hvor målet kom fra (fx *Fra Noter+: Mads*). Resten er **sammenklappelige sektioner**: *Mål*, *Noter+*, *Talstrøm*, *Udseende* og *Værktøj og log*. Lukket viser hver et kort resumé, og appen husker, hvilke der er åbne. **PANIK** står altid nederst.
+
 | Indstilling | Betydning |
 |---|---|
 | **Force aktiv** | Tænd/sluk for force. Slukket = helt almindelig lommeregner. |
@@ -160,13 +162,13 @@ tests/                node:test
 
 Lommeregneren kan forbindes med [Noter+](https://noterplus.vercel.app) via et lille relæ på Railway (`https://relay-production-03f5.up.railway.app`).
 
-Sådan forbinder du: panel → **Forbindelse til Noter+** → skriv samme kode som i Noter+.
+Sådan forbinder du: panel → **Noter+** → skriv samme kode som i Noter+, eller kopiér den i Noter+ og tryk *Indsæt*. Grøn **Forbundet** = Noter+ er set med samme kode. Blå *Venter på Noter+* = koden er sat, men Noter+ er ikke set endnu. *Afbryd* fjerner koden. Tryk på forbindelses-mærket i overblikket for at hoppe til sektionen.
 
 | Funktion | Hvad sker der |
 |---|---|
 | **Modtag mål fra Noter** | Et navn, der er regnet om til et tal (Cryptext), eller et fast tal fra Noter+ bliver straks målet. Force slås til, og tælleren nulstilles |
 | **Send resultater til Noter** | Hvert `=` sendes til Noter+. Noten kan vise resultatet |
-| **Navn (Cryptext)** | Skriv navnet her i stedet. Lommeregneren bruger den bogstav-tabel, Noter+ har sendt |
+| **Navn → tal** (under *Mål*) | Skriv navnet her i stedet. Lommeregneren bruger den bogstav-tabel, Noter+ har sendt |
 
 Ændrer du målet her, følger Noter+ med.
 

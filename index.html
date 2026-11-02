@@ -95,71 +95,141 @@
       <button class="sheet-link bold" id="secret-done">OK</button>
     </div>
     <div class="secret-body">
-      <div class="group">
-        <label class="row"><span>Force aktiv</span><input type="checkbox" class="switch" data-s="enabled"></label>
-        <div class="row"><span>Status</span><span id="s-status" class="muted"></span></div>
+
+      <!-- Overblik: altid synligt -->
+      <div class="hero" id="hero">
+        <div class="hero-row">
+          <div class="hero-main">
+            <span class="hero-label">Rammer nu</span>
+            <b id="s-target" class="hero-num"></b>
+          </div>
+          <label class="hero-sw"><span>Force</span><input type="checkbox" class="switch" data-s="enabled"></label>
+        </div>
+        <p id="s-status" class="hero-status"></p>
+        <div class="chips">
+          <span class="chip" id="chip-link" data-st="off"><i class="dot"></i><span></span></span>
+          <span class="chip" id="chip-src" hidden></span>
+        </div>
       </div>
 
-      <h4>Mål</h4>
-      <div class="group">
-        <div class="row"><div class="seg" data-s-seg="targetMode">
-          <button data-v="fixed">Tal</button><button data-v="tomorrow">I morgen</button><button data-v="today">I dag</button><button data-v="time">Klokken</button>
-        </div></div>
-        <label class="row" id="row-target"><span>Måltal</span><input type="text" inputmode="decimal" data-s="target" placeholder="fx 2100" autocomplete="off"></label>
-        <label class="row" id="row-offset"><span>Minutter frem</span><input type="number" inputmode="numeric" data-s="timeOffset"></label>
-        <div class="row"><span>Rammer nu</span><span id="s-target" class="strong"></span></div>
-      </div>
+      <!-- Mål -->
+      <details class="sec" data-sec="target" open>
+        <summary>
+          <i class="sec-ico" style="--c:#ff9f0a"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6"/></svg></i>
+          <span class="sec-t">Mål</span><span class="sec-v" id="sum-target"></span><i class="chev"></i>
+        </summary>
+        <div class="sec-body">
+          <div class="seg" data-s-seg="targetMode">
+            <button data-v="fixed">Tal</button><button data-v="tomorrow">I morgen</button><button data-v="today">I dag</button><button data-v="time">Klokken</button>
+          </div>
+          <div class="group">
+            <label class="row" id="row-target"><span>Måltal</span><input type="text" inputmode="decimal" data-s="target" placeholder="fx 2100" autocomplete="off"></label>
+            <label class="row" id="row-offset"><span>Minutter frem</span><input type="number" inputmode="numeric" data-s="timeOffset"></label>
+            <div class="row" id="row-auto"><span>Bliver</span><span id="s-auto" class="muted"></span></div>
+          </div>
+          <p class="sub-note">Navn → tal (Cryptext)</p>
+          <div class="group">
+            <label class="row"><span>Navn</span><input type="text" id="s-name" placeholder="fx Lise" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done"></label>
+            <div class="row"><span>Bliver til</span><span id="s-name-out" class="strong">–</span></div>
+            <button class="row btn" id="s-name-use">Brug navnet som mål</button>
+          </div>
+        </div>
+      </details>
 
-      <h4>Forbindelse til Noter+</h4>
-      <div class="group">
-        <label class="row"><span>Kode</span><input type="text" data-s="link" placeholder="samme kode som i Noter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></label>
-        <div class="row"><span>Status</span><span id="s-link" class="muted"></span></div>
-        <label class="row"><span>Modtag mål fra Noter</span><input type="checkbox" class="switch" data-s="linkIn"></label>
-        <label class="row"><span>Send resultater til Noter</span><input type="checkbox" class="switch" data-s="linkOut"></label>
-        <label class="row"><span>Navn (Cryptext)</span><input type="text" id="s-name" placeholder="fx Lise" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done"></label>
-        <div class="row"><span>Bliver til</span><span id="s-name-out" class="strong">–</span></div>
-        <button class="row btn" id="s-name-use">Brug navnet som mål</button>
-      </div>
+      <!-- Forbindelse -->
+      <details class="sec" data-sec="link">
+        <summary>
+          <i class="sec-ico" style="--c:#30d158"><svg viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.3 1.3"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.3-1.3"/></svg></i>
+          <span class="sec-t">Noter+</span><span class="sec-v" id="sum-link" data-st="off"><i class="dot"></i><span></span></span><i class="chev"></i>
+        </summary>
+        <div class="sec-body">
+          <div class="link-card" id="link-card" data-st="off">
+            <div class="lk-state"><i class="dot"></i><b id="s-link"></b></div>
+            <p class="lk-peer" id="s-peer"></p>
+            <label class="lk-code">
+              <span>Kode</span>
+              <input type="text" id="s-code" data-s="link" placeholder="––––––" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">
+            </label>
+            <div class="lk-actions">
+              <button type="button" id="s-code-paste">Indsæt</button>
+              <button type="button" id="s-code-clear">Afbryd</button>
+            </div>
+            <p class="lk-hint">Koden står i Noter+:<br>3 tryk på den øverste bjælke → <b>Lommeregneren</b>.</p>
+          </div>
+          <div class="group">
+            <label class="row"><span>Modtag mål fra Noter+</span><input type="checkbox" class="switch" data-s="linkIn"></label>
+            <label class="row"><span>Send resultater til Noter+</span><input type="checkbox" class="switch" data-s="linkOut"></label>
+          </div>
+        </div>
+      </details>
 
-      <h4>Talstrøm</h4>
-      <div class="group">
-        <label class="row"><span>Tal på skærmen</span>
-          <select data-s="display">
-            <option value="typed">Som tastet</option>
-            <option value="stream">Talstrøm</option>
-          </select></label>
-        <label class="row"><span>Start</span>
-          <select data-s="trigger">
-            <option value="nth">Ved tal nr. N</option>
-            <option value="afterEquals">Første tal efter =</option>
-            <option value="manual">Manuel (tryk øverst i midten)</option>
-          </select></label>
-        <label class="row" id="row-nth"><span>N (tal nr.)</span>
-          <select data-s="nth"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
-        <label class="row"><span>Antal ramte før stop</span>
-          <select data-s="uses"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="0">Ubegrænset</option></select></label>
-        <label class="row"><span>Ret sidste tal ved = / tving med færre tal</span><input type="checkbox" class="switch" data-s="lateFix"></label>
-        <label class="row"><span>Tillad operator-skift</span><input type="checkbox" class="switch" data-s="allowSwap"></label>
-      </div>
+      <!-- Talstrøm -->
+      <details class="sec" data-sec="stream">
+        <summary>
+          <i class="sec-ico" style="--c:#0a84ff"><svg viewBox="0 0 24 24"><path d="M4 7h10M4 12h16M4 17h7"/><path d="M17 4l3 3-3 3"/></svg></i>
+          <span class="sec-t">Talstrøm</span><span class="sec-v" id="sum-stream"></span><i class="chev"></i>
+        </summary>
+        <div class="sec-body">
+          <div class="group">
+            <label class="row"><span>Tal på skærmen</span>
+              <select data-s="display">
+                <option value="typed">Som tastet</option>
+                <option value="stream">Talstrøm</option>
+              </select></label>
+            <label class="row"><span>Start</span>
+              <select data-s="trigger">
+                <option value="nth">Ved tal nr. N</option>
+                <option value="afterEquals">Første tal efter =</option>
+                <option value="manual">Manuel (tryk øverst)</option>
+              </select></label>
+            <label class="row" id="row-nth"><span>Tal nr.</span>
+              <select data-s="nth"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+            <label class="row"><span>Ramte før stop</span>
+              <select data-s="uses"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="0">Ubegrænset</option></select></label>
+          </div>
+          <div class="group">
+            <label class="row"><span>Ret sidste tal ved =</span><input type="checkbox" class="switch" data-s="lateFix"></label>
+            <label class="row"><span>Tillad operator-skift</span><input type="checkbox" class="switch" data-s="allowSwap"></label>
+          </div>
+          <p class="sub-note">"Ret sidste tal" tvinger også, når der tastes færre tal end N.</p>
+        </div>
+      </details>
 
-      <h4>Udseende</h4>
-      <div class="group">
-        <label class="row"><span>Markér valgt operator</span><input type="checkbox" class="switch" data-s="opHighlight"></label>
-        <label class="row"><span>Diskret prik når klar</span><input type="checkbox" class="switch" data-s="indicator"></label>
-        <label class="row"><span>Lodret justering (px, + = op)</span><input type="number" inputmode="numeric" data-s="vAdjust"></label>
-        <div class="row"><span>Skærm</span><span id="s-screen" class="muted"></span></div>
-      </div>
+      <!-- Udseende -->
+      <details class="sec" data-sec="look">
+        <summary>
+          <i class="sec-ico" style="--c:#bf5af2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg></i>
+          <span class="sec-t">Udseende</span><span class="sec-v" id="sum-look"></span><i class="chev"></i>
+        </summary>
+        <div class="sec-body">
+          <div class="group">
+            <label class="row"><span>Markér valgt operator</span><input type="checkbox" class="switch" data-s="opHighlight"></label>
+            <label class="row"><span>Diskret prik når klar</span><input type="checkbox" class="switch" data-s="indicator"></label>
+            <label class="row"><span>Lodret justering (px)</span><input type="number" inputmode="numeric" data-s="vAdjust"></label>
+          </div>
+          <p class="sub-note" id="s-screen"></p>
+        </div>
+      </details>
 
-      <div class="group">
-        <button class="row btn" id="s-reset">Nulstil tæller</button>
-        <button class="row btn" id="s-selftest">Kør selvtest (2.000 regnestykker)</button>
-        <button class="row btn danger" id="s-panic">PANIK – slå force fra</button>
-      </div>
-      <pre id="s-selftest-out" hidden></pre>
+      <!-- Værktøj -->
+      <details class="sec" data-sec="tools">
+        <summary>
+          <i class="sec-ico" style="--c:#8e8e93"><svg viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0 5 5L13 18a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5L17 4l3 3-2.5 2.5"/><path d="M6 18l-2 2"/></svg></i>
+          <span class="sec-t">Værktøj og log</span><span class="sec-v"></span><i class="chev"></i>
+        </summary>
+        <div class="sec-body">
+          <div class="group">
+            <button class="row btn" id="s-reset">Nulstil tæller</button>
+            <button class="row btn" id="s-selftest">Kør selvtest (2.000 regnestykker)</button>
+          </div>
+          <pre id="s-selftest-out" hidden></pre>
+          <p class="sub-note">Log</p>
+          <pre id="s-log"></pre>
+        </div>
+      </details>
 
-      <h4>Log</h4>
-      <pre id="s-log"></pre>
-      <p class="foot">Hemmelig adgang: 5 hurtige tryk i øverste højre hjørne. Panik: hold historik-knappen (uret) inde.</p>
+      <button class="panic" id="s-panic">PANIK – slå force fra</button>
+      <p class="foot">Åbn: 5 hurtige tryk øverst til højre. Panik: hold uret inde.</p>
     </div>
   </div>
 
