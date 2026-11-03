@@ -1,6 +1,6 @@
 // Service worker: alt caches ved installation, så appen virker 100 % offline.
 // Hæv VERSION ved ændringer, så telefonen henter den nye udgave.
-const VERSION = 'calcplus-v7';
+const VERSION = 'calcplus-v8';
 const ASSETS = [
   './',
   'index.html',
@@ -14,6 +14,7 @@ const ASSETS = [
   'src/selftest.js',
   'src/link.js',
   'src/crypt.js',
+  'src/cryptext.js',
   'src/known.js',
   'icons/apple-touch-icon.png',
   'icons/icon-192.png',

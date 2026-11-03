@@ -3,6 +3,7 @@ import { formatNumber, parseDisplay } from './format.js';
 import { loadSettings, resolveTarget, saveSettings } from './settings.js';
 import { createLink, cleanRoom } from './link.js';
 import { planName } from './crypt.js';
+import { wordToDigits } from './cryptext.js';
 
 const $ = (sel) => document.querySelector(sel);
 const app = $('#app');
@@ -434,16 +435,35 @@ function onRemote(st) {
   const seen = Math.max(st.hiNotes?.at || 0, st.force?.by === 'notes' ? st.force.at : 0, st.cmap?.at || 0);
   if (seen > peerSeen) { peerSeen = seen; if (!secret.hidden) syncLinkStatus(); }
   if (st.cmap) { try { localStorage.setItem('cp.cmap', JSON.stringify(st.cmap)); } catch { /* ok */ } }
+  const g = st.google;
+  if (g && typeof g.q === 'string' && g.at > (settings.googleAt || 0)) {
+    settings = { ...settings, googleAt: g.at };
+    saveSettings(settings);
+    if (settings.googleIn) {
+      const r = wordToDigits(g.q);
+      if (r.unsupported.length) calc.log(`Google: "${g.q}" – uden Cryptext-tegn: ${r.unsupported.join(' ')}`);
+      if (r.digits) setRemoteTarget(r.digits, r.name, `Fra Google: ${g.q}`, `Mål fra Google: ${g.q} → ${r.digits}`);
+    }
+  }
   const f = st.force;
   if (settings.linkIn && f && f.by !== 'calc' && f.digits && f.at > (settings.forceAt || 0)) {
-    settings = { ...settings, targetMode: 'fixed', target: f.digits, enabled: true, forceAt: f.at, targetSrc: `Fra Noter+${f.name ? `: ${f.name}` : ''}` };
+    settings = { ...settings, forceAt: f.at };
     saveSettings(settings);
-    calc.setSettings({ targetMode: 'fixed', target: f.digits, enabled: true });
-    calc.resetHits();
-    calc.log(`Mål fra Noter: ${formatNumber(Number(f.digits))}${f.name ? ` (${f.name})` : ''}`);
-    if (!secret.hidden) syncPanel();
-    render();
+    setRemoteTarget(f.digits, f.name, `Fra Noter+${f.name ? `: ${f.name}` : ''}`, `Mål fra Noter: ${formatNumber(Number(f.digits))}${f.name ? ` (${f.name})` : ''}`);
   }
+}
+
+// Sæt mål fra Noter+/Google. Samme tal + navn inden for 10 s (fx Google og så Noter+ for samme ord) = ignorér.
+function setRemoteTarget(digits, name, src, logText) {
+  const lt = settings.lastTarget;
+  if (lt && lt.digits === digits && (lt.name || '') === (name || '') && Date.now() - lt.t < 10000) return;
+  settings = { ...settings, targetMode: 'fixed', target: digits, enabled: true, targetSrc: src, lastTarget: { digits, name: name || '', t: Date.now() } };
+  saveSettings(settings);
+  calc.setSettings({ targetMode: 'fixed', target: digits, enabled: true });
+  calc.resetHits();
+  calc.log(logText);
+  if (!secret.hidden) syncPanel();
+  render();
 }
 
 function sendResult(forced) {

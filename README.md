@@ -173,3 +173,6 @@ Sådan forbinder du: panel → **Noter+** → skriv samme kode som i Noter+, ell
 Ændrer du målet her, følger Noter+ med.
 
 `src/link.js`, `src/crypt.js` og `src/known.js` er kopier fra Noter+. Ret dem dér, og kopiér dem hertil. Se README i Thyxo/NoterPlus.
+
+### Fake Google
+Søger tilskueren på Fake Google (soeg.vercel.app) i samme rum, omsætter lommeregneren selv ordet til Cryptext-cifre med `src/cryptext.js` (kopi fra Noter+, ret dér) – fx "mads" → 59841 – og sætter det som mål. Kontakt: Panel → Forbindelse → **Modtag fra Google** (standard til). Ordet vises aldrig; kun "Fra Google: mads" i panelet og "Mål fra Google: mads → 59841" i loggen. Hvert søgeord bruges én gang (`googleAt`). Kommer samme tal + navn igen inden for 10 s (fx Noter+'s force for samme ord), ignoreres det, så tælleren ikke nulstilles. Æ/ø/å springes over med en linje i loggen.
